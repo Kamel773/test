@@ -1,39 +1,39 @@
-import pandas as pd
 import sqlite3
+import json
 
-# Establish a connection to the database
-conn = sqlite3.connect('your_database.db')
-cursor = conn.cursor()
+def get_table_as_json(db_path, table_name):
+    # Connect to the database
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
 
-# Define the SQL query
-query = 'SELECT * FROM your_table'
+    # Execute the query to select all rows from the table
+    cursor.execute(f"SELECT * FROM {table_name}")
 
-# Set the chunk size (number of rows to fetch at a time)
-chunk_size = 10000
+    # Fetch all rows from the cursor
+    rows = cursor.fetchall()
 
-# Initialize an empty list to store chunks of data
-data_chunks = []
+    # Get the column names from the cursor description
+    columns = [desc[0] for desc in cursor.description]
 
-# Execute the query and fetch data in chunks
-cursor.execute(query)
-while True:
-    chunk = cursor.fetchmany(chunk_size)
-    if not chunk:
-        break
-    data_chunks.append(chunk)
+    # Create a list to store the JSON objects
+    data = []
 
-# Close the database connection
-cursor.close()
-conn.close()
+    # Iterate over the rows and convert each row to a dictionary
+    for row in rows:
+        row_dict = dict(zip(columns, row))
+        data.append(row_dict)
 
-# Concatenate the data chunks into a single DataFrame
-df = pd.DataFrame([row for chunk in data_chunks for row in chunk])
+    # Convert the data list to JSON
+    json_data = json.dumps(data)
 
-# Assign column names if necessary
-# df.columns = ['column1', 'column2', ...]
+    # Close the database connection
+    conn.close()
 
-# Further processing or analysis of the DataFrame
-# ...
+    return json_data
 
-# Display the resulting DataFrame
-print(df)
+# Example usage
+database_path = "example.db"
+table_name = "employees"
+
+json_result = get_table_as_json(database_path, table_name)
+print(json_result)
