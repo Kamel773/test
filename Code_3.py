@@ -1,33 +1,24 @@
-import pyodbc
+from sqlalchemy import create_engine, func
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base
 
-# Set up connection parameters
-server = 'your_server_name'
-database = 'your_database_name'
-username = 'your_username'
-password = 'your_password'
-driver = '{ODBC Driver 17 for SQL Server}'  # Change the driver if necessary
+# Create the SQLAlchemy engine
+engine = create_engine('your_database_connection_string')
 
-# Create a connection string
-connection_string = f'server={server};database={database};uid={username};pwd={password};driver={driver}'
+# Create a session factory
+Session = sessionmaker(bind=engine)
+session = Session()
 
-try:
-    # Establish the connection
-    conn = pyodbc.connect(connection_string)
+# Create a base class for declarative models
+Base = declarative_base()
 
-    # Create a cursor object
-    cursor = conn.cursor()
+# Define your table as a SQLAlchemy model
+class YourTable(Base):
+    __tablename__ = 'your_table_name'
+    id = Column(Integer, primary_key=True)
+    # Define other columns here
 
-    # Execute a sample query
-    cursor.execute('SELECT * FROM your_table_name')
+# Count the number of rows in the table
+row_count = session.query(func.count()).select_from(YourTable).scalar()
 
-    # Fetch and print the result
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
-
-    # Close the cursor and connection
-    cursor.close()
-    conn.close()
-
-except pyodbc.Error as e:
-    print(f"Error connecting to SQL Server: {str(e)}")
+print("Total rows:", row_count)
