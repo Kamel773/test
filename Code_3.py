@@ -1,49 +1,33 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+import pyodbc
 
-# Create the SQLAlchemy engine and session
-engine = create_engine('your_database_connection_string')
-Session = sessionmaker(bind=engine)
-session = Session()
+# Set up connection parameters
+server = 'your_server_name'
+database = 'your_database_name'
+username = 'your_username'
+password = 'your_password'
+driver = '{ODBC Driver 17 for SQL Server}'  # Change the driver if necessary
 
-# Create the base model class
-Base = declarative_base()
+# Create a connection string
+connection_string = f'server={server};database={database};uid={username};pwd={password};driver={driver}'
 
-# Define the table models
-class User(Base):
-    __tablename__ = 'users'
+try:
+    # Establish the connection
+    conn = pyodbc.connect(connection_string)
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    posts = relationship('Post', back_populates='user')
+    # Create a cursor object
+    cursor = conn.cursor()
 
-class Post(Base):
-    __tablename__ = 'posts'
+    # Execute a sample query
+    cursor.execute('SELECT * FROM your_table_name')
 
-    id = Column(Integer, primary_key=True)
-    title = Column(String)
-    user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='posts')
+    # Fetch and print the result
+    rows = cursor.fetchall()
+    for row in rows:
+        print(row)
 
-class Comment(Base):
-    __tablename__ = 'comments'
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
 
-    id = Column(Integer, primary_key=True)
-    content = Column(String)
-    post_id = Column(Integer, ForeignKey('posts.id'))
-    post = relationship('Post', back_populates='comments')
-
-# Joining the tables
-query = session.query(User).join(User.posts).join(Post.comments)
-
-# Retrieve the results
-results = query.all()
-
-# Print the results
-for user in results:
-    print('User:', user.name)
-    for post in user.posts:
-        print('  Post:', post.title)
-        for comment in post.comments:
-            print('    Comment:', comment.content)
+except pyodbc.Error as e:
+    print(f"Error connecting to SQL Server: {str(e)}")
