@@ -1,29 +1,31 @@
-import pandas as pd
-import mysql.connector
+import pymysql
 
-# Connect to the MySQL database
-cnx = mysql.connector.connect(user='your_username',
-                              password='your_password',
-                              host='your_host',
-                              database='your_database')
+def execute_sql_script(filename):
+    # Connect to the database
+    conn = pymysql.connect(host='localhost', user='your_username', password='your_password', db='your_database')
 
-# Define the SQL query to retrieve the data
-query = "SELECT * FROM your_table"
+    # Create a cursor object
+    cursor = conn.cursor()
 
-# Execute the query and fetch the results
-cursor = cnx.cursor()
-cursor.execute(query)
-data = cursor.fetchall()
+    # Read the SQL script file
+    with open(filename, 'r') as file:
+        sql_script = file.read()
 
-# Get the column names from the cursor's description
-column_names = [desc[0] for desc in cursor.description]
+    # Execute the SQL script
+    try:
+        cursor.execute(sql_script)
+        conn.commit()
+        print("SQL script executed successfully.")
+    except Exception as e:
+        conn.rollback()
+        print("Error executing SQL script:", str(e))
 
-# Create a DataFrame using the fetched data and column names
-df = pd.DataFrame(data, columns=column_names)
+    # Close the cursor and connection
+    cursor.close()
+    conn.close()
 
-# Close the cursor and database connection
-cursor.close()
-cnx.close()
+# Specify the path to your SQL script file
+sql_script_file = 'path/to/your/sql_script.sql'
 
-# Print the DataFrame
-print(df)
+# Call the function to execute the SQL script
+execute_sql_script(sql_script_file)
