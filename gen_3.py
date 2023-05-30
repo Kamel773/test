@@ -1,4 +1,6 @@
-def split_list_of_lists(lst):
-    first_elements = [sublist[0] for sublist in lst]
-    second_elements = [sublist[1] for sublist in lst]
-    return [first_elements, second_elements]
+import math
+
+def calculate_lateral_surface_area_cone(radius, height):
+    slant_height = math.sqrt(radius**2 + height**2)
+    lateral_surface_area = math.pi * radius * slant_height
+    return lateral_surface_area
