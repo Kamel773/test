@@ -1,14 +1,9 @@
-def newman_conway(n):
-    # Base cases
-    if n == 1:
-        return 1
-    if n == 2:
-        return 1
+def count_identical_items(list1, list2, list3):
+    count = 0
+    min_length = min(len(list1), len(list2), len(list3))
     
-    # Recursive case
-    return newman_conway(newman_conway(n - 1)) + newman_conway(n - newman_conway(n - 1))
-
-# Testing the function
-print(newman_conway(1))  # Output: 1
-print(newman_conway(5))  # Output: 3
-print(newman_conway(10)) # Output: 6
+    for i in range(min_length):
+        if list1[i] == list2[i] == list3[i]:
+            count += 1
+    
+    return count
