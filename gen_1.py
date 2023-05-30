@@ -1,8 +1,8 @@
-for idx, elem in enumerate(numbers):
-    for idx2, elem2 in enumerate(numbers):
-        if idx != idx2:
-            distance = abs(elem - elem2)
-            if distance < threshold:
-                return True
-
-return False
+def flatten_and_sum(lst):
+    flattened_list = []
+    for item in lst:
+        if isinstance(item, list):
+            flattened_list.extend(flatten_and_sum(item))
+        else:
+            flattened_list.append(item)
+    return sum(flattened_list)
