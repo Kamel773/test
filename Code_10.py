@@ -5,8 +5,8 @@ def detection(db_file, table_name, row_id):
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
-    # Delete the row from the table
-    delete_query = f"DELETE FROM {table_name} WHERE rowid = ?"
+    # Delete the row from the table using a parameterized query
+    delete_query = "DELETE FROM {} WHERE rowid = ?".format(table_name)
     cursor.execute(delete_query, (row_id,))
 
     # Commit the changes and close the connection
