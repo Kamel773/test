@@ -1,6 +1,8 @@
-import subprocess
+import sqlite3
 
-def run_subprocess(command):
-    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = process.communicate()
-    return output.decode('utf-8').strip()
+def insert_null(db_name, table_name, column_name):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO {} ({}) VALUES (?)".format(table_name, column_name), (None,))
+    conn.commit()
+    conn.close()
